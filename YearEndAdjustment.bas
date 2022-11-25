@@ -139,6 +139,23 @@ Private Sub addSheetForNumberOfEmployees(ByRef selectedCompanies() As Variant, B
         
             '// 最初に処理する従業員はこのブックの「レイアウト」をコピーして新しく追加したブックの末尾に追加
             If .Sheets.Count = 1 Then
+                '// QRコードを削除して、適切なものを貼り付け
+                On Error Resume Next
+                
+                With ThisWorkbook.Sheets("レイアウト")
+                    .Shapes("YamagishiUnso").Delete
+                    .Shapes("YCL").Delete
+                    .Shapes("Logisters").Delete
+                    .Shapes("Tokai").Delete
+                End With
+                
+                On Error GoTo 0
+                
+                Call pasteQR(processingCompany, ThisWorkbook.Sheets("レイアウト"), qrRow, qrColumn)
+                
+                '// URLの値を処理中の会社のものにする
+                Call setUrl(processingCompany, ThisWorkbook.Sheets("レイアウト"), urlRow, urlColumn)
+                
                 '// 貼り付ける前に印刷の設定
                 Call setPrintMode(ThisWorkbook.Sheets("レイアウト"))
                 ThisWorkbook.Sheets("レイアウト").Copy After:=.Sheets(1)
@@ -260,7 +277,11 @@ Private Sub deleteFormerQr(ByVal formerProcessingCompany As String, ByVal target
         targetQr = "Tokai"
     End If
     
+    On Error Resume Next
+    
     targetSheet.Shapes(targetQr).Delete
+    
+    On Error GoTo 0
     
 End Sub
 
